@@ -1,6 +1,6 @@
 version: '3.8'
 services:
-  teke-home:
+  take-home:  # ← CAMBIADO
     build: .
     container_name: take-app
     ports:
@@ -9,40 +9,32 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://take_home_db:3306/take_home_challenge?createDatabaseIfNotExist=true&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: appuser
       SPRING_DATASOURCE_PASSWORD: apppassword
-
     restart: always
-
     depends_on:
-      teke_home_db:
-        condition: service_healthy #Le decimos que el ambiente este levantado
-
-
+      take_home_db:  # ← CAMBIADO
+        condition: service_healthy
     networks:
       - take-home-network
 
-
-  teke_home_db:
+  take_home_db:  # ← CAMBIADO
     image: mysql:8
     container_name: take-mysql-prod
-
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: take_home_challenge
       MYSQL_USER: appuser
       MYSQL_PASSWORD: apppassword
-
     ports:
       - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
       - take-home-network
-    healthcheck: # ← ESTO ES NUEVO
+    healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       timeout: 20s
       retries: 10
       start_period: 30s
-
 
 volumes:
   mysql_data:
