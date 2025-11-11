@@ -1,4 +1,6 @@
 package takehomechallenge.controller;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +13,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
+@Tag(name = "Users", description = "User crud")
 @AllArgsConstructor
 public class UserController {
 
@@ -25,30 +28,36 @@ public class UserController {
 
 
     @GetMapping("/findall")
+    @Operation(summary = "Get all users")
     public ResponseEntity<List<UserDto>> findAll() {
         List<UserDto> user = userService.findAll();
         return ResponseEntity.ok(user);
     }
 
     @PostMapping("/save")
+    @Operation(summary = "Create new user")
     public ResponseEntity<UserDto> save(@RequestBody UserDto userDto) {
-        userService.save(userDto);
+        UserDto savedUser = userService.save(userDto);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(userDto);
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Update existing user")
     public ResponseEntity<UserDto> update(@PathVariable int id, @RequestBody UserDto userDto) {
-        Optional<UserDto> op = userService.findById(id);
-        if(op.isEmpty()){
-            return ResponseEntity.notFound().build(); // 404
-        }
-        userService.update(id,userDto);
+        System.out.println("🟢 Controller - ID: " + id);
 
-        return ResponseEntity.ok(op.get());
+        Optional<UserDto> updatedUser = userService.update(id, userDto);
+
+        if (updatedUser.isPresent()) {
+            return ResponseEntity.ok(updatedUser.get()); // ✅ 200 OK
+        } else {
+            return ResponseEntity.notFound().build(); // ✅ 404 Not Found
+        }
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete user")
     public ResponseEntity<UserDto> delete(@PathVariable int id) {
         Optional<UserDto> user = userService.findById(id);
         if(user.isEmpty()) {
