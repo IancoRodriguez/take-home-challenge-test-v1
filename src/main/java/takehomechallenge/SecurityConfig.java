@@ -28,26 +28,30 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
 
+                // session stateless for JWT
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+
                 .authorizeHttpRequests(auth -> auth
-                        // Public endpoints
+                        // Public endpoints (ALL declared BEFORE anyRequest)
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
-
-                        // Swagger endpoints
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/swagger-ui.html").permitAll()
                         .requestMatchers("/v3/api-docs/**").permitAll()
                         .requestMatchers("/swagger-resources/**").permitAll()
                         .requestMatchers("/webjars/**").permitAll()
 
-                        // All other endpoints require authentication
+                        // Specific API rules (example — keep before anyRequest if you need them)
+                        .requestMatchers("/api/public/**").permitAll()
+                        // .requestMatchers("/api/admin/**").hasRole("ADMIN") // ejemplo
+
+                        // everything else requires authentication
                         .anyRequest().authenticated()
                 )
 
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
-
+                // add JWT filter
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         // Allow H2 console frames

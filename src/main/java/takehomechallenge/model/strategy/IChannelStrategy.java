@@ -1,4 +1,7 @@
 package takehomechallenge.model.strategy;
 
-public class IChannelStrategy {
+import takehomechallenge.model.Notification;
+
+public interface IChannelStrategy {
+    void send(Notification n);
 }
